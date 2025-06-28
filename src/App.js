@@ -4,6 +4,8 @@ import Home from './components/Home';
 import Profile from './components/Profile';
 import OutfitDetails from './components/OutfitDetails';
 import './App.css';
+import logo from '../assets/logo.png'; // adjust to your file location
+
 
 function App() {
   const [user, setUser] = useState(null);
@@ -29,6 +31,10 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile user={user} />} />
           <Route path="/outfits/:id" element={<OutfitDetails />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/upload" element={<Protected><Upload /></Protected>} />
+
+
         </Routes>
       </div>
     </Router>
