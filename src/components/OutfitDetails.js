@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import axios from '../api'; // Adjust path if needed
 
 const OutfitDetails = () => {
   const { id } = useParams();
@@ -7,10 +8,10 @@ const OutfitDetails = () => {
   const [outfit, setOutfit] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/outfits/${id}`)
-      .then((res) => res.json())
-      .then((data) => setOutfit(data))
-      .catch((err) => console.error(err));
+    axios
+      .get(`/outfits/${id}`)
+      .then((res) => setOutfit(res.data))
+      .catch((err) => console.error('Failed to fetch outfit:', err));
   }, [id]);
 
   if (!outfit) return <div>Loading...</div>;

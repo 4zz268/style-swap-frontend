@@ -1,37 +1,44 @@
 import React, { useEffect, useState } from 'react';
 import OutfitForm from './OutfitForm';
+import axios from '../api'; // Adjust if needed
 
 const Profile = ({ user }) => {
   const [outfits, setOutfits] = useState([]);
 
   useEffect(() => {
     if (user) {
-      fetch(`http://localhost:5000/api/outfits?user_id=${user.id}`)
-        .then((res) => res.json())
-        .then((data) => setOutfits(data))
-        .catch((err) => console.error(err));
+      axios
+        .get('/outfits')
+        .then((res) => {
+          const userOutfits = res.data.filter((o) => o.user_id === user.id);
+          setOutfits(userOutfits);
+        })
+        .catch((err) => console.error('Failed to fetch outfits:', err));
     }
   }, [user]);
 
-  const handleSubmit = (values, { resetForm }) => {
+  const handleSubmit = async (values, { resetForm }) => {
     const formData = new FormData();
     formData.append('title', values.title);
     formData.append('description', values.description);
     formData.append('category', values.category);
     formData.append('image', values.image);
 
-    fetch('http://localhost:5000/api/outfits', {
-      method: 'POST',
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then(() => {
-        resetForm();
-        fetch(`http://localhost:5000/api/outfits?user_id=${user.id}`)
-          .then((res) => res.json())
-          .then((data) => setOutfits(data));
-      })
-      .catch((err) => console.error(err));
+    try {
+      await axios.post('/outfits', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      resetForm();
+
+      const res = await axios.get('/outfits');
+      const userOutfits = res.data.filter((o) => o.user_id === user.id);
+      setOutfits(userOutfits);
+    } catch (err) {
+      console.error('Failed to submit outfit:', err.response?.data || err.message);
+    }
   };
 
   return (

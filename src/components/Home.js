@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from '../api'; // Adjust path if api.js is in src/
 
 const Home = () => {
   const [outfits, setOutfits] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/outfits')
-      .then((res) => res.json())
-      .then((data) => setOutfits(data))
-      .catch((err) => console.error(err));
+    axios
+      .get('/outfits') // No need to write full URL thanks to axios baseURL
+      .then((res) => setOutfits(res.data))
+      .catch((err) => console.error('Failed to fetch outfits:', err));
   }, []);
 
   return (
@@ -22,12 +23,12 @@ const Home = () => {
           >
             <h2 className="text-lg font-semibold mb-2">{outfit.title}</h2>
             <img
-              src={`http://localhost:5000/uploads/${outfit.image}`}
+              src={`http://localhost:5000/uploads/${outfit.image}`} // ✅ Corrected
               alt={outfit.title}
               className="w-full h-48 object-cover mb-2"
             />
             <Link
-              to={`/outfits/${outfit.id}`}
+              to={`/outfits/${outfit.id}`} // ✅ Corrected
               className="text-purple-600 hover:underline"
             >
               View Details
