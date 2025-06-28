@@ -1,76 +1,97 @@
 import React, { useEffect, useState } from 'react';
-import OutfitForm from './OutfitForm';
 import axios from '../api';
-import { API_BASE_URL } from '../config'; // Optional: centralized base URL
 
-const Profile = ({ user }) => {
-  const [outfits, setOutfits] = useState([]);
+function Profile() {
+  const [user, setUser] = useState(null);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [profilePictureUrl, setProfilePictureUrl] = useState('');
 
   useEffect(() => {
-    if (user) {
-      fetchUserOutfits();
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (storedUser) {
+      axios.get(`/users/${storedUser.id}`)
+        .then((res) => {
+          setUser(res.data);
+          setUsername(res.data.username);
+          setProfilePictureUrl(res.data.profile_picture || '');
+        })
+        .catch((err) => console.error('Error fetching user profile:', err));
     }
-  }, [user]);
+  }, []);
 
-  const fetchUserOutfits = async () => {
-    try {
-      const res = await axios.get('/outfits');
-      const userOutfits = res.data.filter((o) => o.user_id === user.id);
-      setOutfits(userOutfits);
-    } catch (err) {
-      console.error('Failed to fetch outfits:', err);
-    }
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!user) return;
 
-  const handleSubmit = async (values, { resetForm }) => {
-    const formData = new FormData();
-    formData.append('title', values.title);
-    formData.append('description', values.description);
-    formData.append('category', values.category);
-    formData.append('image', values.image);
+    const updatePayload = {
+      username,
+      ...(password && { password }),
+      ...(profilePictureUrl && { profile_picture: profilePictureUrl }),
+    };
 
     try {
-      await axios.post('/outfits', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const response = await axios.put(`/users/${user.id}`, updatePayload, {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true
       });
-
-      resetForm();
-      fetchUserOutfits();
+      setUser(response.data.user);
+      alert('Profile updated successfully!');
     } catch (err) {
-      console.error('Failed to submit outfit:', err.response?.data || err.message);
+      console.error('Error updating profile:', err);
+      alert(err.response?.data?.error || 'Update failed');
     }
   };
+
+  if (!user) return <p className="loading-message">Loading profile...</p>;
 
   return (
-    <div className="p-4 max-w-5xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4 text-purple-700">
-        {user?.username}'s Profile
-      </h1>
+    <div className="profile-container">
+      <h1 className="profile-heading">Welcome, {user.username}</h1>
 
-      <div className="mb-6">
-        <OutfitForm onSubmit={handleSubmit} />
-      </div>
+      {profilePictureUrl && (
+        <img
+          src={profilePictureUrl}
+          alt="Profile"
+          className="profile-picture"
+        />
+      )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {outfits.map((outfit) => (
-          <div
-            key={outfit.id}
-            className="bg-white text-black rounded shadow p-4"
-          >
-            <h2 className="font-semibold text-lg mb-2">{outfit.title}</h2>
-            <img
-              src={`${API_BASE_URL}/uploads/${outfit.image}`}
-              alt={outfit.title}
-              className="w-full h-48 object-cover rounded"
-            />
-            <p className="text-sm text-gray-600 mt-2">Category: {outfit.category}</p>
-          </div>
-        ))}
-      </div>
+      <form onSubmit={handleSubmit} className="profile-form">
+        <div className="form-group">
+          <label>Username:</label>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label>New Password:</label>
+          <input
+            type="password"
+            value={password}
+            placeholder="Leave blank to keep current"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Profile Picture URL:</label>
+          <input
+            type="text"
+            placeholder="https://example.com/image.jpg"
+            value={profilePictureUrl}
+            onChange={(e) => setProfilePictureUrl(e.target.value)}
+          />
+        </div>
+
+        <button type="submit" className="update-button">Update Profile</button>
+      </form>
     </div>
   );
-};
+}
 
 export default Profile;
