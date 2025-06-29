@@ -553,6 +553,7 @@ body {
   color: inherit;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
 }
 
 .outfit-card:hover {
@@ -572,6 +573,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .outfit-title {
@@ -594,7 +596,46 @@ body {
   margin: 0;
 }
 
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background-color: #f9f9f9;
+  border-top: 1px solid #eee;
+  border-radius: 0 0 16px 16px;
+}
 
+.edit-button,
+.delete-button {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.edit-button {
+  background-color: #6b38fb;
+  color: #fff;
+  border: none;
+}
+
+.edit-button:hover {
+  background-color: #5a2dc8;
+}
+
+.delete-button {
+  background-color: #e74c3c;
+  color: #fff;
+  border: none;
+}
+
+.delete-button:hover {
+  background-color: #c0392b;
+}
 
 .profile-container {
   max-width: 600px;
