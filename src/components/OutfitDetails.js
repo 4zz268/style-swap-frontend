@@ -1,56 +1,52 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import axios from '../api';
-import { API_BASE_URL } from '../config';
 
-const OutfitDetails = () => {
+function OutfitDetails() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [outfit, setOutfit] = useState(null);
+  const [username, setUsername] = useState('');
 
   useEffect(() => {
-    axios
-      .get(`/outfits/${id}`)
-      .then((res) => setOutfit(res.data))
-      .catch((err) => console.error('Failed to fetch outfit:', err));
+    axios.get(`/outfits/${id}`)
+      .then(res => {
+        setOutfit(res.data);
+        return axios.get(`/users/${res.data.user_id}`);
+      })
+      .then(userRes => {
+        setUsername(userRes.data.username);
+      })
+      .catch(err => console.error('Error fetching outfit/user:', err));
   }, [id]);
 
-  if (!outfit) return <div className="p-4">Loading...</div>;
+  if (!outfit) return <p className="loading-message">Loading outfit...</p>;
+
+  const { title, description, category, image, created_at } = outfit;
 
   return (
-    <div className="p-4 max-w-3xl mx-auto">
-      <button
-        onClick={() => navigate(-1)}
-        className="mb-4 text-purple-600 hover:underline"
-      >
-        ← Back
-      </button>
+    <div className="outfit-details">
+      <div className="outfit-card">
+        <div className="outfit-card-image">
+          {image ? (
+            <img src={image} alt={title} />
+          ) : (
+            <div className="no-image">No image available</div>
+          )}
+        </div>
 
-      <h1 className="text-3xl font-bold mb-2 text-purple-700">{outfit.title}</h1>
-
-      <img
-        src={`${API_BASE_URL}/uploads/${outfit.image}`}
-        alt={outfit.title}
-        className="w-full h-auto rounded-xl shadow mb-4"
-      />
-
-      <p className="mb-2 text-lg">{outfit.description}</p>
-      <p className="text-sm text-gray-500">Category: {outfit.category}</p>
-      {outfit.created_at && (
-        <p className="text-sm text-gray-400">
-          Uploaded: {new Date(outfit.created_at).toLocaleString()}
-        </p>
-      )}
-
-      <hr className="my-6" />
-
-      {/* Placeholder for comments */}
-      <section>
-        <h2 className="text-xl font-semibold mb-2">Comments</h2>
-        <p className="text-gray-400 italic">Comments coming soon...</p>
-      </section>
+        <div className="outfit-card-info">
+          <h2>{title}</h2>
+          <p className="meta">
+            <span>By <strong>{username || 'Unknown'}</strong></span> •{' '}
+            <span>{new Date(created_at).toLocaleString()}</span>
+          </p>
+          <p className="category"><strong>Category:</strong> {category}</p>
+          <p className="photographer"><strong>Photographer:</strong> {username}</p>
+          <p className="description">{description}</p>
+        </div>
+      </div>
     </div>
   );
-};
+}
 
 export default OutfitDetails;
