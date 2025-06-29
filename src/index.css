@@ -22,11 +22,21 @@ body {
   background-image: url('../public/fashion-hero-banner.jpg');
   background-size: cover;
   background-position: center;
-  height: 70vh;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
+  height: 85vh;
+  width: 100%;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 2rem;
+}
+
+@media (min-width: 1200px) {
+  .hero {
+    height: 105vh;
+  }
 }
 
 .hero-overlay {
