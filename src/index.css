@@ -831,3 +831,41 @@ body {
   line-height: 1.6;
   color: #444;
 }
+
+.error-page {
+  padding: 80px 20px;
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+}
+
+.error-title {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.error-message {
+  margin-top: 20px;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.home-link {
+  display: inline-block;
+  margin-top: 30px;
+  font-size: 1rem;
+  color: #6b38fb;
+  text-decoration: none;
+  border: 1px solid #6b38fb;
+  padding: 10px 20px;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+
+.home-link:hover {
+  background-color: #6b38fb;
+  color: #fff;
+}
+
