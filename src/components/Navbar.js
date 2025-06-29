@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 function Navbar() {
   const navigate = useNavigate();
+  const [latestOutfitId, setLatestOutfitId] = useState(null);
   const user = JSON.parse(localStorage.getItem('user'));
   const defaultProfilePicture = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRP8ndSwnF6GyinN-5s5IgjC-UuH0A6F9TOPfKBA010abgWVTadVvYlHus&s';
 
@@ -19,6 +20,25 @@ function Navbar() {
     }
   };
 
+  useEffect(() => {
+    if (user) {
+      fetch('http://localhost:5000/api/profile', {
+        credentials: 'include',
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.outfits && data.outfits.length > 0) {
+            // Set the most recent outfit ID
+            const sorted = data.outfits.sort(
+              (a, b) => new Date(b.created_at) - new Date(a.created_at)
+            );
+            setLatestOutfitId(sorted[0].id);
+          }
+        })
+        .catch((err) => console.error('Failed to load user outfits:', err));
+    }
+  }, [user]);
+
   return (
     <nav className="navbar">
       <div className="navbar-brand">
@@ -32,6 +52,9 @@ function Navbar() {
           <>
             <Link to="/profile">Profile</Link>
             <Link to="/upload">Upload</Link>
+            {latestOutfitId && (
+              <Link to={`/outfits/${latestOutfitId}/edit`}>Edit Outfit</Link>
+            )}
             <button onClick={handleLogout} className="logout-button">Logout</button>
           </>
         ) : (

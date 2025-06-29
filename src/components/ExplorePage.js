@@ -52,8 +52,11 @@ function ExplorePage() {
               alt={outfit.title}
               className="outfit-image"
             />
-            <h2 className="outfit-title">{outfit.title}</h2>
-            <p className="outfit-category">{outfit.category}</p>
+           <div className="outfit-card-content">
+                <h2 className="outfit-title">{outfit.title}</h2>
+                <p className="outfit-category">Category: {outfit.category}</p>
+                <p className="outfit-description">{outfit.description.length > 24? outfit.description.slice(0, 24) + '...': outfit.description}</p>
+            </div>
           </Link>
         ))}
       </div>
